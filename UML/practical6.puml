@@ -1,0 +1,59 @@
+@startuml
+' Настройка стиля
+skinparam classAttributeIconSize 0
+
+' --- Определение классов ---
+
+class User {
+  + String name
+  + String phone
+  --
+  + login()
+  + logout()
+}
+
+class Driver {
+  + String license_number
+  --
+  + goOnShift()
+  + takeOrder()
+}
+
+class Client {
+  + Double rating
+  --
+  + createOrder()
+}
+
+class Car {
+  + String model
+  + String plate_number
+  + String color
+  --
+  + startEngine()
+  + stopEngine()
+}
+
+class Order {
+  + UUID id
+  + Double price
+  + String status
+  --
+  + calculatePrice()
+  + cancel()
+}
+
+' --- Определение связей ---
+
+' Наследование
+User <|-- Driver
+User <|-- Client
+
+' Агрегация (Водитель использует машину)
+Driver "1" o-- "1" Car : Использует
+
+' Ассоциация (Связи между заказами и людьми)
+Order "many" -- "1" Driver : Исполняет
+Order "many" -- "1" Client : Заказывает
+
+@enduml

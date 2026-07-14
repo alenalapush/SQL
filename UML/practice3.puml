@@ -1,0 +1,42 @@
+@startuml
+' Располагаем элементы слева направо для удобства
+left to right direction
+
+' --- Определение Акторов ---
+actor "Водитель" as Drv
+actor "Диспетчер" as Disp
+
+' --- Граница системы ---
+package "Система управления такси" {
+    ' Общие функции
+    usecase "Вход в систему" as UC_Login
+    
+    ' Функции водителя
+    usecase "Принять заказ" as UC_Accept
+    usecase "Вывод средств" as UC_Withdraw
+    usecase "Проверка личности (KYC)" as UC_KYC
+    usecase "Отправить квитанцию на Email" as UC_Email
+    
+    ' Функции диспетчера
+    usecase "Просмотр всех активных заказов" as UC_ViewOrders
+    usecase "Принудительное назначение водителя" as UC_AssignDriver
+}
+
+' --- Связи Водителя ---
+Drv --> UC_Accept
+Drv --> UC_Withdraw
+
+' Связи включения (include) - выполняются ВСЕГДА
+UC_Withdraw ..> UC_KYC : <<include>>
+UC_Accept ..> UC_Login : <<include>>
+
+' Связь расширения (extend) - выполняется ОПЦИОНАЛЬНО
+' Стрелка идет ОТ дополнительной функции К основной
+UC_Email ..> UC_Withdraw : <<extend>>
+
+' --- Связи Диспетчера ---
+Disp --> UC_ViewOrders
+Disp --> UC_AssignDriver
+UC_ViewOrders ..> UC_Login : <<include>>
+
+@enduml
