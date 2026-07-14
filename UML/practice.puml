@@ -1,0 +1,21 @@
+@startuml
+autonumber
+skinparam style strictuml
+
+actor "Клиент" as User
+participant "Мобильное приложение" as App
+participant "Сервер такси" as Server
+participant "PricingService" as Price
+database "БД" as DB
+actor "Водитель" as Driver
+
+User -> App : Отправляет запрос на поездку
+App -> Server : Передает данные клиента
+Server -> Price : Запрашивает цену
+Price -> DB : Читает тарифы
+DB -> Price : Возвращает тарифы
+Price -> Server : Возвращает цену
+Server -> App : Отправляет цену клиенту
+App -> User : Показывает цену и водителя
+
+@enduml

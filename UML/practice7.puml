@@ -1,0 +1,31 @@
+@startuml
+' Убрана проблемная строка 'skinparam Style strictuml'
+autonumber
+
+actor "Клиент" as User
+participant "Мобильное приложение" as App
+participant "Сервер такси" as Server
+participant "PricingService" as Price
+database "БД" as DB
+actor "Водитель" as Driver
+
+User -> App: клиент отправляет запрос на поездку
+App -> Server: сервер реагирует на запрос и отправляет данные
+Server -> Price: запрашивает калькуляцию (цену) поездки
+Price --> Server: прайс присылает цену поездка
+Server -> App: отправляет цену клиенту
+App -> User: показывает цену клиенту
+Server -> DB: Поиск свободных машин
+DB --> Server: Список водителей
+
+alt Машины найдены
+    Server -> Driver: Запрос на поездку
+    Driver --> Server: Принять заказ
+    Server --> App: 200 OK (Price, Driver_ID)
+    App --> User: Показать карточку заказа и цену
+else Машины не найдены
+    Server --> App: 404 Not Found (No cars)
+    App --> User: Сообщение "Нет свободных машин"
+end
+
+@enduml

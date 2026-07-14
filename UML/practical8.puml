@@ -1,0 +1,63 @@
+@startuml
+' Настройка стиля
+skinparam componentStyle uml2
+left to right direction
+
+package "Client Layer" {
+    [Mobile App] as App <<Component>>
+}
+
+package "API Management" {
+    [API Gateway] as Gateway <<Component>>
+}
+
+package "Core Business Logic" {
+    [Order Service] as Orders <<Component>>
+    [Payment Service] as Payments <<Component>>
+    [Notification Service] as Notifications <<Component>>
+}
+
+package "Data & Analytics" {
+    [Analytics Service] as Analytics <<Component>>
+    queue "Message Broker (Kafka/RabbitMQ)" as Queue
+    database "Main DB" as DB
+}
+
+node "External Systems" {
+    [Google Maps API] as Maps <<Service>>
+    [Stripe Payment] as Stripe <<Service>>
+    [Push Notification Service] as PushSrv <<Service>>
+}
+
+' --- Интерфейсы ---
+interface "Mobile API" as MAPI
+interface "Payment API" as PAPI
+
+' --- Связи ---
+
+' Клиент заходит через шлюз
+App --( MAPI
+MAPI - Gateway
+
+' Шлюз распределяет задачи
+Gateway --> Orders
+Gateway --> Payments
+
+' Сервис заказов взаимодействует с окружением
+Orders ..> DB : CRUD Operations
+Orders ..> Maps : Route & ETA
+Orders ..> Notifications : Trigger: "Status Changed"
+
+' Асинхронная передача данных в аналитику (через очередь)
+Orders ..> Queue : Publish: "Trip Finished"
+Queue ..> Analytics : Consume events
+
+' Платежи
+Payments --( PAPI
+PAPI - Stripe
+
+' Уведомления
+Notifications ..> PushSrv : Send Push
+PushSrv ..> App : Deliver to device
+
+@enduml

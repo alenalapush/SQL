@@ -1,0 +1,35 @@
+@startuml
+header Жизненный цикл заказа (TAX-301)
+skinparam StateFontName sans-serif
+
+' --- Начальная точка ---
+[*] --> Created : Клиент создал заказ
+
+' --- Определение состояний ---
+state Created
+state Searching
+state Driver_Assigned
+state Waiting
+state In_Progress
+state Finished
+state Cancelled
+
+' --- Описание переходов ---
+Created --> Searching : Система инициирует поиск
+
+' --- Описание переходов из Searching ---
+Searching --> Driver_Assigned : Система нашла водителя
+Searching --> Cancelled : Клиент отменил поиск
+
+' --- Путь до Finished через Waiting ---
+Driver_Assigned --> Waiting : Водитель прибыл на место
+Driver_Assigned --> Cancelled : Клиент отменил до подачи
+
+Waiting --> In_Progress : Водитель нажал "Поехали"
+In_Progress --> Finished : Водитель нажал "Завершить"
+
+' --- Финальные точки ---
+Finished --> [*]
+Cancelled --> [*]
+
+@enduml
